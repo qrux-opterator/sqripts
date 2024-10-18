@@ -74,7 +74,7 @@ Type=simple
 Restart=always
 RestartSec=5s
 WorkingDirectory=/root/ceremonyclient/node
-ExecStart=/root/ceremonyclient/node/node-2.0.0.9-linux-amd64
+ExecStart=/root/ceremonyclient/node/node-2.0.1-linux-amd64
 KillSignal=SIGINT
 TimeoutStopSec=30s
 
