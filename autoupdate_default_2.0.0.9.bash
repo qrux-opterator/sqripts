@@ -63,15 +63,16 @@ run_update() {
     service ceremonyclient stop
 
     # Update ExecStart path to new version in the service file
-    sudo awk '/^ExecStart=/ {$NF="2.0.0.9"}1' /etc/systemd/system/para.service > temp
+    sudo awk '/^ExecStart=/ {$NF="2.0.0.9"}1' /lib/systemd/system/ceremonyclient.service > temp
     sudo mv temp /etc/systemd/system/para.service
+
 
     # Reload systemd daemon and restart the service
     systemctl daemon-reload
-    service para restart
+    service ceremonyclient restart
 
     # Monitor the service logs
-    journalctl -u para.service --no-hostname -f
+    journalctl -u ceremonyclient.service --no-hostname -f
 
     # Remove the cron job that triggers the update check every 5 minutes
     crontab -l | grep -v 'update_binary.sh' | crontab -
