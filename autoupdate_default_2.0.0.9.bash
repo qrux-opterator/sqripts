@@ -104,9 +104,11 @@ check_update_needed "https://releases.quilibrium.com/release"
 # Output whether an update is needed
 if [ "$update_needed" = true ]; then
     echo "Update needed: yes"
+    echo "$(date): Update needed: $update_needed" >> /root/update.log
     # Call the update script if update is needed
     run_update
 else
     echo "Update needed: no"
+    echo "$(date): Update needed: $update_needed" >> /root/update.log
+
 fi
-echo "$(date): Update needed: $update_needed" >> /root/update.log
