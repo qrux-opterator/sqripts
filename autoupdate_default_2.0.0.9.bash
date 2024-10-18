@@ -51,8 +51,8 @@ run_update() {
     
     for file in $files; do
         version=$(echo "$file" | cut -d '-' -f 2)
-        if ! test -f "./$file"; then
-            curl -s "https://releases.quilibrium.com/$file" > "$file"
+        if ! test -f "$check_directory/$file"; then
+            curl -s "https://releases.quilibrium.com/$file" > "$check_directory/$file"
             echo "Downloaded and updated $file"
         else
             echo "$file is already up-to-date."
