@@ -64,8 +64,22 @@ run_update() {
     service ceremonyclient stop
 
     # Update ExecStart path to new version in the service file
-    sudo awk '/^ExecStart=/ {$NF="2.0.0.9"}1' /lib/systemd/system/ceremonyclient.service > temp
-    sudo mv temp /lib/systemd/system/ceremonyclient.service
+    cat << 'EOF' | sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null
+    [Unit]
+    Description=Ceremony Client Go App Service
+    
+    [Service]
+    Type=simple
+    Restart=always
+    RestartSec=5s
+    WorkingDirectory=/root/ceremonyclient/node
+    ExecStart=/root/ceremonyclient/node/node-2.0.0.9-linux-amd64
+    KillSignal=SIGINT
+    TimeoutStopSec=30s
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
 
 
     # Reload systemd daemon and restart the service
