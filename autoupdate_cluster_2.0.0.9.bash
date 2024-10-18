@@ -62,19 +62,20 @@ run_update() {
     service ceremonyclient stop
 
     # Update ExecStart path to new version in the service file
-    sudo awk '/^ExecStart=/ {$NF="2.0.0.9"}1' /etc/systemd/system/para.service > temp
+    sudo awk '/^ExecStart=/ {$NF="2.0.1"}1' /etc/systemd/system/para.service > temp
     sudo mv temp /etc/systemd/system/para.service
+
+
+
+    # Remove the cron job that triggers the update check every 5 minutes
+    /usr/bin/crontab -l | grep -v '/root/autoupdate_default_2.0.0.9.bash' | /usr/bin/crontab -
+    echo "Cron job for /root/autoupdate_default_2.0.0.9.bash removed after update."
 
     # Reload systemd daemon and restart the service
     systemctl daemon-reload
     service para restart
-
     # Monitor the service logs
     journalctl -u para.service --no-hostname -f
-
-    # Remove the cron job that triggers the update check every 5 minutes
-    crontab -l | grep -v 'update_binary.sh' | crontab -
-    echo "Cron job for update_binary.sh removed after update."
 
 }
 
