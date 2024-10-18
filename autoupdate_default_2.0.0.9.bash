@@ -29,6 +29,7 @@ check_update_needed () {
         fi
     done
 }
+
 run_update() {
 
     # Function to update service and restart it
@@ -65,22 +66,21 @@ run_update() {
 
     # Update ExecStart path to new version in the service file
     cat << 'EOF' | sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null
-    [Unit]
-    Description=Ceremony Client Go App Service
-    
-    [Service]
-    Type=simple
-    Restart=always
-    RestartSec=5s
-    WorkingDirectory=/root/ceremonyclient/node
-    ExecStart=/root/ceremonyclient/node/node-2.0.0.9-linux-amd64
-    KillSignal=SIGINT
-    TimeoutStopSec=30s
-    
-    [Install]
-    WantedBy=multi-user.target
-    EOF
+[Unit]
+Description=Ceremony Client Go App Service
 
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+WorkingDirectory=/root/ceremonyclient/node
+ExecStart=/root/ceremonyclient/node/node-2.0.0.9-linux-amd64
+KillSignal=SIGINT
+TimeoutStopSec=30s
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
     # Reload systemd daemon and restart the service
     systemctl daemon-reload
@@ -92,7 +92,6 @@ run_update() {
     # Remove the cron job that triggers the update check every 5 minutes
     crontab -l | grep -v 'update_binary.sh' | crontab -
     echo "Cron job for update_binary.sh removed after update."
-
 }
 
 # Call the run_update function
