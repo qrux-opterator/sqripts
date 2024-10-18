@@ -65,7 +65,7 @@ run_update() {
 
     # Update ExecStart path to new version in the service file
     sudo awk '/^ExecStart=/ {$NF="2.0.0.9"}1' /lib/systemd/system/ceremonyclient.service > temp
-    sudo mv temp /etc/systemd/system/para.service
+    sudo mv temp /lib/systemd/system/ceremonyclient.service
 
 
     # Reload systemd daemon and restart the service
