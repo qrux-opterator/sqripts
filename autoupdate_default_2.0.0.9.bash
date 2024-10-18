@@ -90,7 +90,7 @@ EOF
     journalctl -u ceremonyclient.service --no-hostname -f
 
     # Remove the cron job that triggers the update check every 5 minutes
-    crontab -l | grep -v 'update_binary.sh' | crontab -
+    crontab -l | grep -v 'autoupdate' | crontab -
     echo "Cron job for update_binary.sh removed after update."
 }
 
