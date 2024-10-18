@@ -108,3 +108,4 @@ if [ "$update_needed" = true ]; then
 else
     echo "Update needed: no"
 fi
+echo "$(date): Update needed: $update_needed" >> /root/update.log
