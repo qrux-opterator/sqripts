@@ -1,5 +1,5 @@
 #!/bin/bash
-
+check_directory="/root/ceremonyclient/node"
 update_needed=false
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -20,7 +20,7 @@ check_update_needed () {
 
     for file in $file_list; do
         version=$(echo "$file" | cut -d '-' -f 2)
-        if ! test -f "./$file"; then
+        if ! test -f "$check_directory/$file"; then
             echo "Update needed for $file (version: $version)"
             update_needed=true
         else
