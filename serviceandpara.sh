@@ -66,4 +66,5 @@ StandardError=syslog
 SyslogIdentifier=para
 
 [Install]
-WantedBy=multi-user.target" | sudo tee /etc/systemd/system/para.service && sudo systemctl daemon-reload && sudo systemctl enable para.service && echo "Default para.sh with Service file is ready!"
+WantedBy=multi-user.target" | sudo tee /etc/systemd/system/para.service && sudo systemctl daemon-reload && sudo systemctl enable para.service && echo -e "\e[32mDefault para.sh with Service file is ready!\e[0m"
+
