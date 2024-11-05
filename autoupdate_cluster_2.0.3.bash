@@ -67,16 +67,17 @@ run_update() {
     # Disable and stop the ceremonyclient service
     systemctl disable ceremonyclient
     service ceremonyclient stop
+    service para stop
 
     # Update ExecStart path to new version in the service file
-    sudo awk '/^ExecStart=/ {$NF="2.0.1"}1' /etc/systemd/system/para.service > temp
+    sudo awk '/^ExecStart=/ {$NF="2.0.3"}1' /etc/systemd/system/para.service > temp
     sudo mv temp /etc/systemd/system/para.service
 
 
 
     # Remove the cron job that triggers the update check every 5 minutes
-    /usr/bin/crontab -l | grep -v '/root/autoupdate_default_2.0.0.9.bash' | /usr/bin/crontab -
-    echo "Cron job for /root/autoupdate_default_2.0.0.9.bash removed after update."
+    /usr/bin/crontab -l | grep -v '/root/autoupdate_cluster_2.0.3.bash' | /usr/bin/crontab -
+    echo "Cron job for /root/autoupdate_cluster_2.0.3.bash removed after update."
 
     # Reload systemd daemon and restart the service
     systemctl daemon-reload
