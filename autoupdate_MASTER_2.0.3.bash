@@ -76,8 +76,8 @@ run_update() {
 
 
     # Remove the cron job that triggers the update check every 5 minutes
-    /usr/bin/crontab -l | grep -v '/root/autoupdate_SLAVE_2.0.3.bash' | /usr/bin/crontab -
-    echo "Cron job for /root/autoupdate_SLAVE_2.0.3.bash removed after update."
+    /usr/bin/crontab -l | grep -v '/root/autoupdate_MASTER_2.0.3.bash' | /usr/bin/crontab -
+    echo "Cron job for /root/autoupdate_MASTER_2.0.3.bash removed after update."
 
     # Reload systemd daemon and restart the service
     systemctl daemon-reload
