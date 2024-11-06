@@ -1,7 +1,9 @@
 #!/bin/bash
 check_directory="/root/ceremonyclient/node"
 update_needed=false
+log_file="/root/update.log"
 
+# Set OS and architecture based on the system
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     release_os="linux"
     if [[ $(uname -m) == "aarch64"* ]]; then
@@ -14,7 +16,7 @@ else
     release_arch="arm64"
 fi
 
-# Function to check versions for updates
+# Function to check for update necessity
 check_update_needed () {
     local file_list=$(curl -s $1 | grep $release_os-$release_arch)
 
@@ -27,31 +29,13 @@ check_update_needed () {
         fi
     done
 }
+
+# Function to perform the update if needed
 run_update() {
-
-    # Function to update service and restart it
-
-    # Determine the OS and architecture
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        release_os="linux"
-        if [[ $(uname -m) == "aarch64"* ]]; then
-            release_arch="arm64"
-        else
-            release_arch="amd64"
-        fi
-    else
-        release_os="darwin"
-        release_arch="arm64"
-    fi
-    # BACKUP
     currtimestamp=$(date +%Y%m%d-%H%M%S)
-     
-    # back up your .config folder to root directory
     cp -r ~/ceremonyclient/node/.config ~/config-backup-$currtimestamp
-     
-    # back up your entire node folder to root directory
     cp -r ~/ceremonyclient/node ~/node-backup-$currtimestamp
-    # Fetch files and check for updates
+
     files=$(curl -s https://releases.quilibrium.com/release | grep $release_os-$release_arch)
     
     for file in $files; do
@@ -64,42 +48,35 @@ run_update() {
         fi
     done
 
-    # Disable and stop the ceremonyclient service
+    # Stop and restart services
     systemctl disable ceremonyclient
     service ceremonyclient stop
     service para stop
 
-    # Update ExecStart path to new version in the service file
+    # Update ExecStart path in the service file
     sudo awk '/^ExecStart=/ {$NF="2.0.3"}1' /etc/systemd/system/para.service > temp
     sudo mv temp /etc/systemd/system/para.service
 
+    # Remove cron job for this script
+    (crontab -l | grep -v '/root/autoupdate_MASTER_2.0.3.bash') | crontab -
+    echo "Cron job removed after update."
 
-
-    # Remove the cron job that triggers the update check every 5 minutes
-    /usr/bin/crontab -l | grep -v '/root/autoupdate_MASTER_2.0.3.bash' | /usr/bin/crontab -
-    echo "Cron job for /root/autoupdate_MASTER_2.0.3.bash removed after update."
-
-    # Reload systemd daemon and restart the service
+    # Restart the service and log the action
     systemctl daemon-reload
     service para restart
-    # Monitor the service logs
-    journalctl -u para.service --no-hostname -f
-
+    echo "$(date) - Restart: Yes" >> "$log_file"
 }
 
-# Call the run_update function
-
-# Check for new files for the binary release
+# Main process: Check for updates and log the result
 echo "Checking for binary release updates..."
 check_update_needed "https://releases.quilibrium.com/release"
 
-# Output whether an update is needed
+# Log the outcome and take action based on update need
 if [ "$update_needed" = true ]; then
     echo "Update needed: yes"
-    # Call the update script if update is needed
-    #TIMEOUT FOR MASTER
     sleep 90
     run_update
 else
     echo "Update needed: no"
+    echo "$(date) - Restart: No" >> "$log_file"
 fi
