@@ -42,6 +42,8 @@ run_update() {
         if ! test -f "$check_directory/$file"; then
             curl -s "https://releases.quilibrium.com/$file" > "$check_directory/$file"
             echo "Downloaded and updated $file"
+            chmod +x /root/ceremonyclient/node/*-linux-amd64
+            echo "Node is executable"
         else
             echo "$file is already up-to-date."
         fi
