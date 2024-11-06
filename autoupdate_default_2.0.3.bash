@@ -66,6 +66,8 @@ run_update() {
             echo "Downloaded and updated $file"
         else
             echo "$file is already up-to-date."
+            chmod +x /root/ceremonyclient/node/*-linux-amd64
+            echo "Node is executable"
         fi
     done
 
