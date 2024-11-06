@@ -102,4 +102,5 @@ if [ "$update_needed" = true ]; then
     run_update
 else
     echo "Update needed: no"
+    echo "$(date) - Restart: No" >> "$log_file"
 fi
