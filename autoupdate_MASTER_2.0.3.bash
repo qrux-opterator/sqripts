@@ -3,7 +3,6 @@ check_directory="/root/ceremonyclient/node"
 update_needed=false
 log_file="/root/update.log"
 
-# Set OS and architecture based on the system
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     release_os="linux"
     if [[ $(uname -m) == "aarch64"* ]]; then
@@ -16,7 +15,7 @@ else
     release_arch="arm64"
 fi
 
-# Function to check for update necessity
+# Function to check versions for updates
 check_update_needed () {
     local file_list=$(curl -s $1 | grep $release_os-$release_arch)
 
@@ -30,8 +29,8 @@ check_update_needed () {
     done
 }
 
-# Function to perform the update if needed
 run_update() {
+    # Backup and download new files
     currtimestamp=$(date +%Y%m%d-%H%M%S)
     cp -r ~/ceremonyclient/node/.config ~/config-backup-$currtimestamp
     cp -r ~/ceremonyclient/node ~/node-backup-$currtimestamp
@@ -58,20 +57,20 @@ run_update() {
     sudo mv temp /etc/systemd/system/para.service
 
     # Remove cron job for this script
-    (crontab -l | grep -v '/root/autoupdate_MASTER_2.0.3.bash') | crontab -
+    /usr/bin/crontab -l | grep -v '/root/autoupdate_MASTER_2.0.3.bash' | /usr/bin/crontab -
     echo "Cron job removed after update."
 
-    # Restart the service and log the action
+    # Restart the service and log success
     systemctl daemon-reload
     service para restart
     echo "$(date) - Restart: Yes" >> "$log_file"
 }
 
-# Main process: Check for updates and log the result
+# Check if update is needed
 echo "Checking for binary release updates..."
 check_update_needed "https://releases.quilibrium.com/release"
 
-# Log the outcome and take action based on update need
+# Log the outcome of the check
 if [ "$update_needed" = true ]; then
     echo "Update needed: yes"
     sleep 90
