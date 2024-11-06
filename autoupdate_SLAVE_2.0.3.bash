@@ -1,6 +1,7 @@
 #!/bin/bash
 check_directory="/root/ceremonyclient/node"
 update_needed=false
+log_file="/root/update.log"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     release_os="linux"
