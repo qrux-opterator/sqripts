@@ -46,16 +46,7 @@ run_update() {
         release_os="darwin"
         release_arch="arm64"
     fi
-    # BACKUP 
-    currtimestamp=$(date +%Y%m%d-%H%M%S)
      
-    # back up your .config folder to root directory
-    cp -r ~/ceremonyclient/node/.config ~/config-backup-$currtimestamp
-     
-    # back up your entire node folder to root directory
-    cp -r ~/ceremonyclient/node ~/node-backup-$currtimestamp
-
-
     # Fetch files and check for updates
     files=$(curl -s https://releases.quilibrium.com/release | grep $release_os-$release_arch)
     
