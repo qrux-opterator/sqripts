@@ -1,6 +1,6 @@
 #!/bin/bash
 check_directory="/root/ceremonyclient/node"
-
+log_file="/root/update.log"
 update_needed=false
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
