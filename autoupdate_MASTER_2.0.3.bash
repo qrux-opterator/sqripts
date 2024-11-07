@@ -30,10 +30,6 @@ check_update_needed () {
 }
 
 run_update() {
-    # Backup and download new files
-    currtimestamp=$(date +%Y%m%d-%H%M%S)
-    cp -r ~/ceremonyclient/node/.config ~/config-backup-$currtimestamp
-    cp -r ~/ceremonyclient/node ~/node-backup-$currtimestamp
 
     files=$(curl -s https://releases.quilibrium.com/release | grep $release_os-$release_arch)
     
