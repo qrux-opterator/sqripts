@@ -51,11 +51,11 @@ run_update() {
     service para stop
 
     # Update ExecStart path in the service file
-    sudo awk '/^ExecStart=/ {$NF="2.0.3.4"}1' /etc/systemd/system/para.service > temp
+    sudo awk '/^ExecStart=/ {$NF="2.0.3.4.4"}1' /etc/systemd/system/para.service > temp
     sudo mv temp /etc/systemd/system/para.service
 
     # Remove cron job for this script
-    /usr/bin/crontab -l | grep -v '/root/autoupdate_MASTER_2.0.3.4.bash' | /usr/bin/crontab -
+    /usr/bin/crontab -l | grep -v '/root/autoupdate_MASTER_2.0.3.4.4.bash' | /usr/bin/crontab -
     echo "Cron job removed after update."
 
     # Restart the service and log success
