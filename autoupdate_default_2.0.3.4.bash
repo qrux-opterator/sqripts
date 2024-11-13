@@ -107,7 +107,6 @@ check_update_needed "https://releases.quilibrium.com/release"
 if [ "$update_needed" = true ]; then
     echo "Update needed: yes"
     echo "$(date): Update needed: $update_needed" >> /root/update.log
-    sleep 
     random_sleep=$(( RANDOM % 120 ))
     echo "Sleeping for $random_sleep seconds..." 
     sleep $random_sleep
