@@ -93,7 +93,6 @@ EOF
     # Remove the cron job that triggers the update check every 5 minutes
     /usr/bin/crontab -l | grep -v '/root/autoupdate_default_2.0.3.4.bash' | /usr/bin/crontab -
     echo "Cron job for /root/autoupdate_default_2.0.3.4.bash removed after update."
-    journalctl -u ceremonyclient.service --no-hostname -f
 
 }
 
