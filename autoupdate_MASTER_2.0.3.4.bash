@@ -71,8 +71,8 @@ check_update_needed "https://releases.quilibrium.com/release"
 # Log the outcome of the check
 if [ "$update_needed" = true ]; then
     echo "Update needed: yes"
-    sleep 90
-    random_sleep=$(( RANDOM % 61 ))
+    sleep 240
+    random_sleep=$(( RANDOM % 90 ))
     echo "Sleeping for $random_sleep seconds..." 
     sleep $random_sleep
     run_update
