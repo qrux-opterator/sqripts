@@ -81,7 +81,6 @@ run_update() {
     systemctl daemon-reload
     service para restart
     # Monitor the service logs
-    journalctl -u para.service --no-hostname -f
 
 }
 
