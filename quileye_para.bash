@@ -6,7 +6,7 @@ export LC_ALL=C
 OUTPUT_LOG="/root/quileye.log"
 
 # Define the number of log entries to display
-DISPLAY_COUNT=10  # Adjust as needed
+DISPLAY_COUNT=50  # Adjust as needed
 
 # We will fetch DISPLAY_COUNT + 1 entries to have a previous entry for gap calculation
 FETCH_COUNT=$((DISPLAY_COUNT + 1))
