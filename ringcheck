@@ -1,0 +1,22 @@
+journalctl -u ceremonyclient.service --no-hostname --reverse | \
+grep -m 3 "shard" | \
+sed 's/ node-[^ ]*://' | \
+while read -r line; do
+    # Extract the date part (first three fields)
+    date_part=$(echo "$line" | awk '{print $1, $2, $3}')
+
+    # Extract the JSON part
+    json_part=$(echo "$line" | grep -o '{.*}')
+
+    # Parse JSON and extract required fields using jq
+    frame_number=$(echo "$json_part" | jq '.frame_number')
+    frame_age=$(echo "$json_part" | jq '.frame_age')
+    ring=$(echo "$json_part" | jq '.ring')
+    active_workers=$(echo "$json_part" | jq '.active_workers')
+
+    # Round frame_age to two decimal places
+    frame_age_rounded=$(printf "%.2f" "$frame_age")
+
+    # Print the formatted output
+    echo "$date_part - FrameNr: $frame_number FrameAge: $frame_age_rounded - Ring: $ring - Active_workers: $active_workers"
+done > /root/framecheck.log && cat /root/framecheck.log
