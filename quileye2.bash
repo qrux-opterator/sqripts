@@ -70,11 +70,24 @@ analyze_proofs() {
     TEMP_SUBMIT_FRAMES=$(mktemp)
     TEMP_MATCHES=$(mktemp)
 
-    # Detect service name
-    if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
-        SERVICE_NAME=qmaster
+    if [ "${#found[@]}" -eq 1 ]; then
+        # If only one service is found, use it
+        SERVICE_NAME=$(echo "${found[0]}" | sed 's/.service//')  # Remove .service suffix
+    elif [ "${#found[@]}" -gt 1 ]; then
+        # If multiple services are found, prompt the user to select one
+        echo "Multiple services are running. Please select one:"
+        select service in "${found[@]}"; do
+            if [ -n "$service" ]; then
+                SERVICE_NAME=$(echo "$service" | sed 's/.service//')  # Remove .service suffix
+                break
+            else
+                echo "Invalid selection. Please try again."
+            fi
+        done
     else
-        SERVICE_NAME=ceremonyclient
+        # Exit with an error if no services are found
+        echo "No matching services are running."
+        exit 1
     fi
 
     # Function: Calculate average
