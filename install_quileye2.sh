@@ -39,23 +39,38 @@ install_scripts() {
 # Create crontab entry
 setup_cron() {
     echo "Setting up crontab for blink_quileye.bash..."
+
+    # Check and remove existing crontab entry for blink_quileye.bash
+    if crontab -l 2>/dev/null | grep -q "blink_quileye.bash"; then
+        echo "Removing existing crontab entry for blink_quileye.bash..."
+        crontab -l 2>/dev/null | grep -v "blink_quileye.bash" | crontab -
+    fi
+
+    # Prompt the user for the update interval in minutes
     read -p "How often should the Balance be Updated? Set in minutes: " interval
+    
+    # Validate the interval is a numeric value
     if ! [[ "$interval" =~ ^[0-9]+$ ]]; then
         echo -e "${RED}Invalid interval. Please enter a numeric value.${RESET}"
         return 1
     fi
+
+    # Add the new crontab entry
     local cron_entry="*/${interval} * * * * /root/blink_quileye.bash"
     (crontab -l 2>/dev/null; echo "${cron_entry}") | crontab -
+    
     if [[ $? -eq 0 ]]; then
         echo -e "${GREEN}Crontab entry created successfully.${RESET}"
         echo "Current crontab entries:"
-        echo -e "${BLUE}$(crontab -l | grep blink_quileye.bash)${RESET}"
+        crontab -l | grep "blink_quileye.bash"
     else
         echo -e "${RED}Failed to create crontab entry.${RESET}"
         return 1
     fi
+
     return 0
 }
+
 
 # Run blink_quileye.bash and open_quileye.py
 run_scripts() {
