@@ -35,8 +35,17 @@ fetch_node_and_coin_info() {
     # Get the current date
     date_info=$(date)
 
-    # Get the coin count
-    coin_count=$(/root/ceremonyclient/client/qclient-2.0.3-linux-amd64 token coins --config /root/ceremonyclient/node/.config | wc -l)
+    # Check if the first qclient path exists
+    if [ -f /root/ceremonyclient/client/qclient-2.0.4-linux-amd64 ]; then
+        coin_count=$(/root/ceremonyclient/client/qclient-2.0.4-linux-amd64 token coins --config /root/ceremonyclient/node/.config | wc -l)
+    elif [ -f /root/ceremonyclient/node/qclient-2.0.4-linux-amd64 ]; then
+        # Check if the second qclient path exists
+        coin_count=$(/root/ceremonyclient/node/qclient-2.0.4-linux-amd64 token coins --config /root/ceremonyclient/node/.config | wc -l)
+    else
+        # If neither exists, set coin_count to -1 to indicate an issue
+        coin_count=-1
+    fi
+
 
     # Run node-info and format output
     ./node-2.0.4-linux-amd64 --node-info | awk -v date="$date_info" -v coins="$coin_count" '
