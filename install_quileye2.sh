@@ -96,6 +96,18 @@ run_scripts() {
 
 # Main execution
 main() {
+    echo "Checking if pip is installed..."
+    if ! command -v pip3 &>/dev/null; then
+        echo "pip3 not found. Installing python3-pip..."
+        sudo apt update && sudo apt install -y python3-pip
+        if [[ $? -ne 0 ]]; then
+            echo "Failed to install python3-pip. Exiting."
+            exit 1
+        fi
+    else
+        echo "pip3 is already installed."
+    fi
+    
     echo "Checking if 'wcwidth' Python module is installed..."
     # Find the path to the python3 binary being used
     PYTHON_BIN=$(which python3)
