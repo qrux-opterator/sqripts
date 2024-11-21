@@ -80,8 +80,6 @@ analyze_proofs() {
     # If the settings file exists, use the saved service and skip further checks
     if [ -f "$SETTINGS_FILE" ]; then
         SERVICE_NAME=$(cat "$SETTINGS_FILE")
-        echo "Using saved service from $SETTINGS_FILE: $SERVICE_NAME"
-        return 0
     else
         # Find running services that match the options
         local found=()
