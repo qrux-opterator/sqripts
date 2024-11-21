@@ -81,6 +81,7 @@ run_scripts() {
 
 # Main execution
 main() {
+    import wcswidth
     install_scripts
     if [[ $? -ne 0 ]]; then
         echo -e "${RED}Installation failed. Exiting.${RESET}"
