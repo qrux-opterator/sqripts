@@ -5,7 +5,7 @@ BASE_URL="https://raw.githubusercontent.com/qrux-opterator/sqripts/refs/heads/ma
 FILES=(
     "open_quileye.py"
     "blink_quileye.bash"
-    "qnode_proof_monitor_light.sh"
+    "quileye2.bash"
 )
 
 # Installation directory
