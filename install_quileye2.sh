@@ -81,7 +81,20 @@ run_scripts() {
 
 # Main execution
 main() {
-    import wcswidth
+    echo "Checking if wcwidth module is installed..."
+    python3 -c "import wcwidth" 2>/dev/null
+    if [[ $? -ne 0 ]]; then
+        echo -e "${BLUE}wcwidth not found. Installing...${RESET}"
+        pip3 install wcwidth
+        if [[ $? -ne 0 ]]; then
+            echo -e "${RED}Failed to install wcwidth. Exiting.${RESET}"
+            exit 1
+        else
+            echo -e "${GREEN}wcwidth installed successfully.${RESET}"
+        fi
+    else
+        echo -e "${GREEN}wcwidth is already installed.${RESET}"
+    fi
     install_scripts
     if [[ $? -ne 0 ]]; then
         echo -e "${RED}Installation failed. Exiting.${RESET}"
