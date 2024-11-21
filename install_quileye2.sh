@@ -5,7 +5,7 @@ BASE_URL="https://raw.githubusercontent.com/qrux-opterator/sqripts/refs/heads/ma
 FILES=(
     "open_quileye.py"
     "blink_quileye.bash"
-    "quileye2.bash"
+    "qnode_proof_monitor_light.sh"
 )
 
 # Installation directory
@@ -99,7 +99,7 @@ main() {
     echo "Checking if pip is installed..."
     if ! command -v pip3 &>/dev/null; then
         echo "pip3 not found. Installing python3-pip..."
-        sudo apt update && sudo apt install -y python3-pip
+        sudo apt update -y && sudo apt install -y python3-pip
         if [[ $? -ne 0 ]]; then
             echo "Failed to install python3-pip. Exiting."
             exit 1
