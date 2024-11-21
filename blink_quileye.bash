@@ -2,7 +2,7 @@
 
 # Description:
 # This script ensures LastUserCheck: and LastAutoCheck: exist in the log file.
-# It increments LastAutoCheck, appends a new Check-Nr header, runs /root/qnode_proof_monitor_light.sh,
+# It increments LastAutoCheck, appends a new Check-Nr header, runs /root/quileye2.bash,
 # and appends its output to the log.
 
 # Log file path
@@ -36,8 +36,8 @@ else
     NEW_CHECK=1
 fi
 
-# Step 5: Run /root/qnode_proof_monitor_light.sh and capture its output
-QUILEYE_OUTPUT=$(/root/qnode_proof_monitor_light.sh)
+# Step 5: Run /root/quileye2.bash and capture its output
+QUILEYE_OUTPUT=$(/root/quileye2.bash)
 
 # Step 6: Append the new header, a new line, and the output to the log
 {
