@@ -95,10 +95,8 @@ analyze_proofs() {
         if [ "${#found[@]}" -eq 1 ]; then
             # If only one service is found, use it directly
             SERVICE_NAME=$(echo "${found[0]}" | sed 's/.service//')  # Remove .service suffix
-            echo "Found single service: $SERVICE_NAME"
         elif [ "${#found[@]}" -gt 1 ]; then
             # If multiple services are found, prompt the user to select one
-            echo "Multiple services are running. Please select one:"
             select service in "${found[@]}"; do
                 if [ -n "$service" ]; then
                     SERVICE_NAME=$(echo "$service" | sed 's/.service//')  # Remove .service suffix
