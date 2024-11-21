@@ -12,13 +12,13 @@ LOG_FILE="/root/quileye2.log"
 if [[ ! -f "$LOG_FILE" ]]; then
     echo "Log file not found. Creating $LOG_FILE..."
     touch "$LOG_FILE"
-    echo "LastUserCheck: 0" >> "$LOG_FILE"
+    echo "LastUserCheck: 1" >> "$LOG_FILE"
     echo "LastAutoCheck: 0" >> "$LOG_FILE"
 fi
 
 # Step 2: Ensure LastUserCheck: and LastAutoCheck: exist in the log
 if ! grep -q "LastUserCheck:" "$LOG_FILE"; then
-    echo "LastUserCheck: 0" | cat - "$LOG_FILE" > /tmp/quileye2.tmp && mv /tmp/quileye2.tmp "$LOG_FILE"
+    echo "LastUserCheck: 1" | cat - "$LOG_FILE" > /tmp/quileye2.tmp && mv /tmp/quileye2.tmp "$LOG_FILE"
 fi
 
 if ! grep -q "LastAutoCheck:" "$LOG_FILE"; then
