@@ -81,32 +81,8 @@ analyze_proofs() {
     if [ -f "$SETTINGS_FILE" ]; then
         SERVICE_NAME=$(cat "$SETTINGS_FILE")
     else
-        # Find running services that match the options
-        local found=()
-        for service in "${SERVICE_OPTIONS[@]}"; do
-            if systemctl is-active --quiet "$service"; then
-                found+=("$service")
-            fi
-        done
-
-        # Handle different scenarios
-        if [ "${#found[@]}" -eq 1 ]; then
-            # If only one service is found, use it directly
-            SERVICE_NAME=$(echo "${found[0]}" | sed 's/.service//')  # Remove .service suffix
-        elif [ "${#found[@]}" -gt 1 ]; then
-            # If multiple services are found, prompt the user to select one
-            select service in "${found[@]}"; do
-                if [ -n "$service" ]; then
-                    SERVICE_NAME=$(echo "$service" | sed 's/.service//')  # Remove .service suffix
-                    break
-                else
-                    echo "Invalid selection. Please try again."
-                fi
-            done
-        else
-            # Exit if no matching services are found
-            read -p "Chose Your Service name! For example: ceremonyclient or para: " SERVICE_NAME
-        fi
+        # Just Promt for the Service
+        read -p "Chose Your Service name! For example: ceremonyclient or para: " SERVICE_NAME
     
         # Save the selected service to the settings file
         echo "$SERVICE_NAME" > "$SETTINGS_FILE"
