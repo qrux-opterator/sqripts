@@ -105,8 +105,7 @@ analyze_proofs() {
             done
         else
             # Exit if no matching services are found
-            echo "No matching services are running."
-            exit 1
+            read -p "Chose Your Service name! For example: ceremonyclient or para: " SERVICE_NAME
         fi
     
         # Save the selected service to the settings file
