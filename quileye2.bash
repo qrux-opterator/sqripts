@@ -5,6 +5,9 @@
 # 1. Fetch and format node and coin information.
 # 2. Analyze proof creation and submission frame ages with reduced output.
 
+# Find running services
+found=($(systemctl list-units --type=service --state=running | awk '{print $1}' | grep -E "$(IFS=\|; echo "${services[*]}")"))
+
 # Default time window for proof analysis (3 hours by default)
 DEFAULT_TIME_WINDOW=180
 TIME_WINDOW=${1:-$DEFAULT_TIME_WINDOW}
