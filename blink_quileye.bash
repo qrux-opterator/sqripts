@@ -42,4 +42,4 @@ QUILEYE_OUTPUT=$(/root/quileye2.bash)
 sed -i "s/LastAutoCheck: $LAST_CHECK/LastAutoCheck: $NEW_CHECK/" "$LOG_FILE"
 
 # Optional: Display a message to indicate success
-echo "Ensured LastUserCheck and LastAutoCheck exist, appended Check-Nr $NEW_CHECK, and updated LastAutoCheck in $LOG_FILE"
+# echo "Ensured LastUserCheck and LastAutoCheck exist, appended Check-Nr $NEW_CHECK, and updated LastAutoCheck in $LOG_FILE"
