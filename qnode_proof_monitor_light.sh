@@ -16,25 +16,49 @@ services=("ceremonyclient.service" "para.service")
 # Find running services
 found=($(systemctl list-units --type=service --state=running | awk '{print $1}' | grep -E "$(IFS=\|; echo "${services[*]}")"))
 
-# Determine the service to use
-if [ "${#found[@]}" -eq 1 ]; then
-    # If only one service is found, use it
-    SERVICE_NAME=$(echo "${found[0]}" | sed 's/.service//')  # Remove .service suffix
-elif [ "${#found[@]}" -gt 1 ]; then
-    # If multiple services are found, prompt the user to select one
-    echo "Multiple services are running. Please select one:"
-    select service in "${found[@]}"; do
-        if [ -n "$service" ]; then
-            SERVICE_NAME=$(echo "$service" | sed 's/.service//')  # Remove .service suffix
-            break
-        else
-            echo "Invalid selection. Please try again."
+local SERVICE_OPTIONS=("para.service" "alt.service")  # Define services to check
+local SETTINGS_FILE="/root/quileye_settings.txt"      # File to save the selected service
+local SERVICE_NAME                                    # Variable to hold the selected service
+
+# If the settings file exists, use the saved service and skip further checks
+if [ -f "$SETTINGS_FILE" ]; then
+    SERVICE_NAME=$(cat "$SETTINGS_FILE")
+    echo "Using saved service from $SETTINGS_FILE: $SERVICE_NAME"
+    return 0
+else
+    # Find running services that match the options
+    local found=()
+    for service in "${SERVICE_OPTIONS[@]}"; do
+        if systemctl is-active --quiet "$service"; then
+            found+=("$service")
         fi
     done
-else
-    # Exit with an error if no services are found
-    echo "No matching services are running."
-    exit 1
+
+    # Handle different scenarios
+    if [ "${#found[@]}" -eq 1 ]; then
+        # If only one service is found, use it directly
+        SERVICE_NAME=$(echo "${found[0]}" | sed 's/.service//')  # Remove .service suffix
+        echo "Found single service: $SERVICE_NAME"
+    elif [ "${#found[@]}" -gt 1 ]; then
+        # If multiple services are found, prompt the user to select one
+        echo "Multiple services are running. Please select one:"
+        select service in "${found[@]}"; do
+            if [ -n "$service" ]; then
+                SERVICE_NAME=$(echo "$service" | sed 's/.service//')  # Remove .service suffix
+                break
+            else
+                echo "Invalid selection. Please try again."
+            fi
+        done
+    else
+        # Exit if no matching services are found
+        echo "No matching services are running."
+        exit 1
+    fi
+
+    # Save the selected service to the settings file
+    echo "$SERVICE_NAME" > "$SETTINGS_FILE"
+    echo "Service name saved to $SETTINGS_FILE: $SERVICE_NAME"
 fi
 
 
