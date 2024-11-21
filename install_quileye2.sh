@@ -83,12 +83,12 @@ run_scripts() {
         return 1
     fi
 
-    echo "Running open_quileye.py for the first time..."
-    python3 /root/open_quileye.py
+    echo "Running quileye2.bash for the first time..."
+    /root/quileye2.bash
     if [[ $? -eq 0 ]]; then
-        echo -e "${GREEN}open_quileye.py executed successfully.${RESET}"
+        echo -e "${GREEN}quileye2.bash executed successfully.${RESET}"
     else
-        echo -e "${RED}Failed to execute open_quileye.py.${RESET}"
+        echo -e "${RED}Failed to execute quileye2.bash.${RESET}"
         return 1
     fi
     return 0
