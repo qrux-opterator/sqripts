@@ -81,19 +81,32 @@ run_scripts() {
 
 # Main execution
 main() {
-    echo "Checking if wcwidth module is installed..."
-    python3 -c "import wcwidth" 2>/dev/null
+    echo "Checking if 'wcwidth' Python module is installed..."
+    # Find the path to the python3 binary being used
+    PYTHON_BIN=$(which python3)
+    if [[ -z "$PYTHON_BIN" ]]; then
+        echo -e "${RED}Python3 is not installed. Please install Python3 first.${RESET}"
+        exit 1
+    fi
+
+    # Use python3 to verify if wcwidth is available
+    $PYTHON_BIN -c "import wcwidth" 2>/dev/null
     if [[ $? -ne 0 ]]; then
-        echo -e "${BLUE}wcwidth not found. Installing...${RESET}"
-        pip3 install wcwidth
-        if [[ $? -ne 0 ]]; then
-            echo -e "${RED}Failed to install wcwidth. Exiting.${RESET}"
-            exit 1
+        echo -e "${BLUE}'wcwidth' not found. Installing it...${RESET}"
+        $PYTHON_BIN -m ensurepip --upgrade 2>/dev/null
+        $PYTHON_BIN -m pip install --upgrade pip
+        $PYTHON_BIN -m pip install wcwidth
+
+        # Verify installation again
+        $PYTHON_BIN -c "import wcwidth" 2>/dev/null
+        if [[ $? -eq 0 ]]; then
+            echo -e "${GREEN}'wcwidth' installed successfully.${RESET}"
         else
-            echo -e "${GREEN}wcwidth installed successfully.${RESET}"
+            echo -e "${RED}Failed to install 'wcwidth'. Exiting.${RESET}"
+            exit 1
         fi
     else
-        echo -e "${GREEN}wcwidth is already installed.${RESET}"
+        echo -e "${GREEN}'wcwidth' is already installed.${RESET}"
     fi
     install_scripts
     if [[ $? -ne 0 ]]; then
