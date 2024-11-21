@@ -254,6 +254,19 @@ def create_special_event_message(prover_ring_diff):
 
     return display_menu(special_event_title, content)
 
+def update_last_user_check(log_lines, last_auto_check):
+    """
+    Aktualisiert den LastUserCheck-Wert in den Logzeilen auf den Wert von LastAutoCheck.
+    """
+    updated_lines = []
+    for line in log_lines:
+        if line.startswith("LastUserCheck:"):
+            updated_line = f"LastUserCheck: {last_auto_check}\n"
+            updated_lines.append(updated_line)
+        else:
+            updated_lines.append(line)
+    return updated_lines
+
 def main():
     log_file_path = "/root/quileye2.log"  # Pfad zur Logdatei
 
@@ -270,9 +283,17 @@ def main():
     last_auto_check = None
     for line in log_content_stripped:
         if line.startswith("LastUserCheck:"):
-            last_user_check = int(line.split(":")[1].strip())
+            try:
+                last_user_check = int(line.split(":")[1].strip())
+            except ValueError:
+                print("Error: Ungültiger Wert für LastUserCheck.")
+                return
         elif line.startswith("LastAutoCheck:"):
-            last_auto_check = int(line.split(":")[1].strip())
+            try:
+                last_auto_check = int(line.split(":")[1].strip())
+            except ValueError:
+                print("Error: Ungültiger Wert für LastAutoCheck.")
+                return
 
     if last_user_check is None or last_auto_check is None:
         print("Error: LastUserCheck oder LastAutoCheck nicht in der Logdatei gefunden.")
@@ -298,16 +319,18 @@ def main():
     # Spezifische Prover Ring Differenz extrahieren
     prover_ring_diff = auto_data.get("Prover Ring", 0) - user_data.get("Prover Ring", 0)
 
-    # Erstelle und zeige die spezielle Ereignismeldung, wenn die Prover Ring Differenz nicht null ist
+    # Erstelle die spezielle Ereignismeldung, wenn die Prover Ring Differenz nicht null ist
+    special_event_menu = None
     if prover_ring_diff != 0:
         special_event_menu = create_special_event_message(prover_ring_diff)
+
+    # Anzeige des Änderungsmenüs nur wenn Änderungen vorhanden sind
+    if changes:
         if special_event_menu:
             print(special_event_menu)
-
-    # Anzeige des Änderungsmenüs
-    title_changes = f"Change since {autocheck_difference} Autochecks:"
-    menu_changes = display_menu(title_changes, formatted_changes)
-    print(menu_changes)
+        title_changes = f"Change since {autocheck_difference} Autochecks:"
+        menu_changes = display_menu(title_changes, formatted_changes)
+        print(menu_changes)
 
     # Formatierung der AutoCheck Details für das zweite Menü
     auto_lines_formatted = "\n".join(
@@ -321,9 +344,9 @@ def main():
         # Erwartete Struktur:
         # Line 0: "Check-Nr X:"
         # Line 1: "Peer ID: ... - Date: ..."
-        # Line 2: "Max Frame: ... - Active Workers: ... - Prover Ring: ... - Seniority: ... - Coins: ... - Owned balance: ... QUIL"
+        # Line 2: "Max Frame: ... - Active Workers: ... - Prover Ring: ... - Seniority: ... - Coins: ... - Owned balance: ..."
         # Line 3: "XXX Proofs - Creation: ... - Submission: ... - CPU-Processing: ..."
-
+        
         # Neuer Titel mit Farben
         new_title = f"{color_text('Last Node Check:', YELLOW, bold=True)} - Check-Nr {color_text(f'{last_auto_check}:', BLUE, bold=False)}"
 
@@ -349,6 +372,16 @@ def main():
     new_content = "\n".join(new_content_lines)
     last_node_check_menu = display_menu(new_title, new_content)
     print(last_node_check_menu)
+
+    # Aktualisiere LastUserCheck auf LastAutoCheck in den Logzeilen
+    updated_log_lines = update_last_user_check(log_content_colored, last_auto_check)
+
+    # Schreibe die aktualisierten Zeilen zurück in die Logdatei
+    try:
+        with open(log_file_path, 'w') as log_file:
+            log_file.writelines(updated_log_lines)
+    except Exception as e:
+        print(f"Error beim Aktualisieren der Logdatei: {e}")
 
 if __name__ == "__main__":
     main()
