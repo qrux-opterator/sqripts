@@ -11,12 +11,32 @@
 DEFAULT_TIME_WINDOW=180
 TIME_WINDOW=${1:-$DEFAULT_TIME_WINDOW}
 
-# Service Configuration
-if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
-    SERVICE_NAME=qmaster
+services=("ceremonyclient.service" "para.service")
+
+# Find running services
+found=($(systemctl list-units --type=service --state=running | awk '{print $1}' | grep -E "$(IFS=\|; echo "${services[*]}")"))
+
+# Determine the service to use
+if [ "${#found[@]}" -eq 1 ]; then
+    # If only one service is found, use it
+    SERVICE_NAME=$(echo "${found[0]}" | sed 's/.service//')  # Remove .service suffix
+elif [ "${#found[@]}" -gt 1 ]; then
+    # If multiple services are found, prompt the user to select one
+    echo "Multiple services are running. Please select one:"
+    select service in "${found[@]}"; do
+        if [ -n "$service" ]; then
+            SERVICE_NAME=$(echo "$service" | sed 's/.service//')  # Remove .service suffix
+            break
+        else
+            echo "Invalid selection. Please try again."
+        fi
+    done
 else
-    SERVICE_NAME=ceremonyclient
+    # Exit with an error if no services are found
+    echo "No matching services are running."
+    exit 1
 fi
+
 
 # Temporary files
 TEMP_CREATE=$(mktemp)
