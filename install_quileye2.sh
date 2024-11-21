@@ -154,7 +154,9 @@ main() {
     fi
 
     echo -e "${GREEN}Installation and setup completed successfully!${RESET}"
-    echo -e "Run--> ${RED}python3 /root/open_quileye.py${RESET} <--to check your Progress. Good Luck! 😊🍀"
+    echo -e "Here are the Logs --> ${BLUE}cat /root/quileye2.log${RESET} <--"
+    echo -e "Change service here  --> ${BLUE}cat /root/quileye_settings.txt${RESET} <-- "
+    echo -e "👁 Run--> ${RED}python3 /root/open_quileye.py${RESET} <--to check your Progress. Good Luck! 😊🍀"
 }
 
 main
