@@ -40,10 +40,10 @@ fetch_node_and_coin_info() {
 
     # Check if the first qclient path exists
     if [ -f /root/ceremonyclient/client/qclient-2.0.4.1-linux-amd64 ]; then
-        coin_count=$(/root/ceremonyclient/client/qclient-2.0.4.1-linux-amd64 token coins --config /root/ceremonyclient/node/.config | wc -l)
+        coin_count=$(/root/ceremonyclient/client/qclient-2.0.4.1-linux-amd64 token coins --public-rpc --config /root/ceremonyclient/node/.config | wc -l)
     elif [ -f /root/ceremonyclient/node/qclient-2.0.4.1-linux-amd64 ]; then
         # Check if the second qclient path exists
-        coin_count=$(/root/ceremonyclient/node/qclient-2.0.4.1-linux-amd64 token coins --config /root/ceremonyclient/node/.config | wc -l)
+        coin_count=$(/root/ceremonyclient/node/qclient-2.0.4.1-linux-amd64 token coins  --public-rpc --config /root/ceremonyclient/node/.config | wc -l)
     else
         # If neither exists, set coin_count to -1 to indicate an issue
         coin_count=-1
