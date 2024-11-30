@@ -29,11 +29,13 @@ fi
 
 # Calculate per worker metrics
 if [ "$ACTIVE_WORKERS" -gt 0 ]; then
+    TOTAL_PER_WORKER=$(awk "BEGIN {print $TOTAL_QUIL / $ACTIVE_WORKERS}")
     AVG_PER_WORKER=$(awk "BEGIN {print $AVERAGE_QUIL / $ACTIVE_WORKERS}")
     MEDIAN_PER_WORKER=$(awk "BEGIN {print $MEDIAN_QUIL / $ACTIVE_WORKERS}")
     HIGH_PER_WORKER=$(awk "BEGIN {print $HIGH_QUIL / $ACTIVE_WORKERS}")
     LOW_PER_WORKER=$(awk "BEGIN {print $LOW_QUIL / $ACTIVE_WORKERS}")
 else
+    TOTAL_PER_WORKER="N/A"
     AVG_PER_WORKER="N/A"
     MEDIAN_PER_WORKER="N/A"
     HIGH_PER_WORKER="N/A"
@@ -79,6 +81,7 @@ fi
   printf "%-25s %-20s\n" "High QUIL per Coin:" "$HIGH_QUIL"
   printf "%-25s %-20s\n" "Low QUIL per Coin:" "$LOW_QUIL"
   printf "%-25s %-20s\n" "Active Workers:" "$ACTIVE_WORKERS"
+  printf "%-25s %-20s\n" "Total QUIL per Worker:" "$TOTAL_PER_WORKER"
   printf "%-25s %-20s\n" "Average per Worker:" "$AVG_PER_WORKER"
   printf "%-25s %-20s\n" "Median per Worker:" "$MEDIAN_PER_WORKER"
   printf "%-25s %-20s\n" "High per Worker:" "$HIGH_PER_WORKER"
