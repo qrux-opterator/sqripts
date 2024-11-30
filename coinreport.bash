@@ -40,9 +40,37 @@ else
     LOW_PER_WORKER="N/A"
 fi
 
+# Calculate landing rate
+LANDING_RATE=$(echo "$COIN_DATA" | awk '
+/Frame / {
+    n++
+    match($0, /Frame ([0-9]+),/, arr)
+    frame = arr[1]
+    frames[n] = frame
+}
+END {
+    asort(frames)
+    first_frame = frames[1]
+    last_frame = frames[n]
+    frame_diff = last_frame - first_frame
+    landing_rate = (frame_diff != 0) ? (n / frame_diff) * 100 : 0
+    printf("%.2f", landing_rate)
+}')
+
+# Determine landing rate color
+if (( $(echo "$LANDING_RATE < 5" | bc -l) )); then
+    RATE_COLOR="\033[31m" # Red
+elif (( $(echo "$LANDING_RATE > 10" | bc -l) )); then
+    RATE_COLOR="\033[32m" # Green
+else
+    RATE_COLOR="" # Default
+fi
+
 # Append the report to /root/coinreport.log
 {
   echo ""
+  # Print Landing Rate with ANSI color
+  printf "Landing Rate: \033[32m%s%%\033[0m\n" "$LANDING_RATE"
   date
   echo -e "━━━━━━━━━━━━━━━━ COINREPORT ━━━━━━━━━━━━━━━━"
   printf "%-25s %-20s\n" "Total QUIL:" "$TOTAL_QUIL"
@@ -55,7 +83,7 @@ fi
   printf "%-25s %-20s\n" "Median per Worker:" "$MEDIAN_PER_WORKER"
   printf "%-25s %-20s\n" "High per Worker:" "$HIGH_PER_WORKER"
   printf "%-25s %-20s\n" "Low per Worker:" "$LOW_PER_WORKER"
-  printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+  printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
 } >> /root/coinreport.log
 
 # Display the content of the log file
