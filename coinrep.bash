@@ -101,7 +101,7 @@ fi
   # Print Landing Rate with ANSI color
   printf "Landing Rate: \033[32m%s%%\033[0m\n" "$LANDING_RATE"
   date
-  echo -e "━━━━━━━━━━━━━━━━ COINREPORT ━━━━━━━━━━━━━━━━"
+  echo -e "━━━━━━━━━━━━━━━━ COINREPORT "$HOURS"hs  ━━━━━━━━━━━━━━━━"
   printf "%-25s %-20s\n" "Total QUIL earned:" "$TOTAL_QUIL"
   printf "%-25s %-20s\n" "Average QUIL per Coin:" "$AVERAGE_QUIL"
   printf "%-25s %-20s\n" "Median QUIL per Coin:" "$MEDIAN_QUIL"
