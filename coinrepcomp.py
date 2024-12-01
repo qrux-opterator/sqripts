@@ -1,4 +1,3 @@
-root@server:~# cat coinrepcomp.py
 import os
 import re
 from tabulate import tabulate
