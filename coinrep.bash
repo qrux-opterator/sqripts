@@ -1,13 +1,14 @@
 #!/bin/bash
 
+# Check if an argument is provided; default to 24 if not
+HOURS=${1:-24}
 
-# Navigate to the directory
 cd /root/ceremonyclient/node
 
 # Retrieve and process coin metadata
 COIN_DATA=$(
    ./qclient-2.0.4.1-linux-amd64 token coins metadata --public-rpc --config /root/ceremonyclient/node/.config | \
-awk '
+awk -v hours="$HOURS" '
 BEGIN {
     ENVIRON["TZ"] = "UTC"
 }
@@ -28,8 +29,8 @@ BEGIN {
             now_epoch = systime()
             # Calculate time difference
             diff = now_epoch - ts_epoch
-            # Check if the timestamp is within the last 24 hours
-            if (diff >= 0 && diff <= 24*3600) {
+            # Check if the timestamp is within the last specified hours
+            if (diff >= 0 && diff <= hours * 3600) {
                 print $6, $0
             }
             break
@@ -37,7 +38,6 @@ BEGIN {
     }
 }' | sort | cut -d' ' -f2-
 )
-
 
 # Extract QUIL values and calculate total, average, median, high, and low
 QUIL_VALUES=$(echo "$COIN_DATA" | awk '/QUIL/ {print $1}')
@@ -114,7 +114,7 @@ fi
   printf "%-25s %-20s\n" "High per Worker:" "$HIGH_PER_WORKER"
   printf "%-25s %-20s\n" "Low per Worker:" "$LOW_PER_WORKER"
   printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-} >> /root/coinreport24.log
+} >> /root/coinreport.log
 
 # Display the content of the log file
-cat /root/coinreport24.log
+cat /root/coinreport.log
