@@ -162,8 +162,8 @@ def main():
         # Retrieve the latest two reports
         latest_two_reports = get_latest_reports(file_path, 2)
 
-        # Assign each report to variables 'new' and 'previous'
-        new, previous = latest_two_reports
+        # Assign each report to variables 'new' and 'previous' (swapped)
+        previous, new = latest_two_reports  # Switched the order
 
         # Generate the comparison table
         comparison_table = generate_comparison_table(new, previous)
