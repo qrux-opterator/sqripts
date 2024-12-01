@@ -22,6 +22,13 @@ def parse_report(report_lines):
     if not report_lines:
         return data
 
+    # Extract the "COINREPORT Xhs" line and extract the number
+    coinreport_line = next((line for line in report_lines if "COINREPORT" in line), None)
+    if coinreport_line:
+        match = re.search(r"COINREPORT (\d+)hs", coinreport_line)
+        if match:
+            data['Check'] = match.group(1)
+
     # First line is 'Landing Rate: XX.XX%'
     line = report_lines[0]
     if line.startswith('Landing Rate:'):
@@ -86,6 +93,8 @@ def convert_value(value):
     Converts a string to a float, removing any non-numeric characters like '%'.
     Returns the number as a float. If conversion fails, returns None.
     """
+    if value is None:
+        return None
     # Remove any non-numeric characters except for '.' and '-'
     cleaned_value = re.sub(r'[^\d\.-]', '', value)
     try:
@@ -96,20 +105,15 @@ def convert_value(value):
 def compare_values(new_value, previous_value, metric):
     """
     Compares two numerical values and returns a formatted difference string.
-    Includes debug statements to output the calculation.
     """
     if new_value is not None and previous_value is not None:
         difference = new_value - previous_value
-        # Debug Statement
-        print(f"DEBUG: Comparing '{metric}': New Value = {new_value}, Previous Value = {previous_value}, Difference = {difference:.2f}")
         if difference > 0:
             return f"{Fore.GREEN}🟩🔼 +{difference:.2f}{Style.RESET_ALL}"
         elif difference < 0:
             return f"{Fore.RED}🟥🔽 {difference:.2f}{Style.RESET_ALL}"
         else:
             return f"{Fore.YELLOW}➖ No Change{Style.RESET_ALL}"
-    # Debug Statement for non-numeric or missing values
-    print(f"DEBUG: Cannot compare '{metric}'. New Value = {new_value}, Previous Value = {previous_value}")
     return f"{Fore.YELLOW}➖ N/A{Style.RESET_ALL}"
 
 def generate_comparison_table(new_report, previous_report):
@@ -118,35 +122,64 @@ def generate_comparison_table(new_report, previous_report):
     Applies specific formatting to certain metrics.
     """
     table_data = []
-    headers = ["Metric", "New Value", "Previous Value", "Difference"]
+    headers = ["Metric", "Last Check", "Previous Check", "Difference"]
 
-    # Define keys to compare (exclude non-numeric keys like 'Date' and 'raw')
-    keys_to_compare = [key for key in new_report.keys() if key not in ['Date', 'raw']]
+    # Get the check numbers (timeframes)
+    last_check = new_report.get('Check', 'N/A')
+    previous_check = previous_report.get('Check', 'N/A')
+
+    # Map 'Check' numbers to timeframes
+    timeframe_mapping = {'2': '2 Hours', '24': '24 Hours'}
+    last_timeframe = timeframe_mapping.get(last_check, last_check)
+    previous_timeframe = timeframe_mapping.get(previous_check, previous_check)
+
+    # Change 'Check' row to 'Timeframe' and update values
+    table_data.append(['Timeframe', last_timeframe, previous_timeframe, '22 Hours'])
+
+    # Define the keys to compare
+    keys_to_compare = [key for key in new_report.keys() if key not in ['Date', 'raw', 'Check']]
 
     for key in keys_to_compare:
         new_val_str = new_report.get(key, 'N/A')
         prev_val_str = previous_report.get(key, 'N/A')
 
-        # Convert values, handling '%' symbol if present
+        # Convert values to numeric types
         new_val_numeric = convert_value(new_val_str)
         prev_val_numeric = convert_value(prev_val_str)
 
-        # Compare values and get the comparison string
-        difference = compare_values(new_val_numeric, prev_val_numeric, key)
+        # For 'Total QUIL earned' and 'Total per Worker', normalize values
+        if key in ['Total QUIL earned', 'Total per Worker']:
+            # Normalize values to 22 hours
+            try:
+                last_hours = int(re.sub(r'[^\d]', '', last_timeframe))
+                prev_hours = int(re.sub(r'[^\d]', '', previous_timeframe))
+                new_normalized = new_val_numeric * (22 / last_hours) if new_val_numeric is not None else None
+                prev_normalized = prev_val_numeric * (22 / prev_hours) if prev_val_numeric is not None else None
+                # Use normalized values for comparison
+                difference = compare_values(new_normalized, prev_normalized, key)
+                # Display normalized values in parentheses
+                if new_normalized is not None:
+                    new_val_str += f" ({new_normalized:.2f})"
+                if prev_normalized is not None:
+                    prev_val_str += f" ({prev_normalized:.2f})"
+            except (ValueError, ZeroDivisionError):
+                # In case of invalid timeframe, fall back to original values
+                difference = compare_values(new_val_numeric, prev_val_numeric, key)
+        else:
+            # Use original values for comparison
+            difference = compare_values(new_val_numeric, prev_val_numeric, key)
 
         # Apply formatting
         if key == 'Total QUIL earned':
-            # Bold and Yellow for new value
             new_val_str = f"{Style.BRIGHT}{Fore.YELLOW}{new_val_str}{Style.RESET_ALL}"
         if key == 'Average per Worker':
-            # Bold for both new and previous values
             new_val_str = f"{Style.BRIGHT}{new_val_str}{Style.RESET_ALL}"
             prev_val_str = f"{Style.BRIGHT}{prev_val_str}{Style.RESET_ALL}"
 
         # Append the row to table data
         table_data.append([key, new_val_str, prev_val_str, difference])
 
-    # Create the table using tabulate with 'fancy_grid' format and left alignment
+    # Create the table using tabulate
     table = tabulate(
         table_data,
         headers=headers,
@@ -163,7 +196,7 @@ def main():
         latest_two_reports = get_latest_reports(file_path, 2)
 
         # Assign each report to variables 'new' and 'previous' (swapped)
-        previous, new = latest_two_reports  # Switched the order
+        previous, new = latest_two_reports  # Swapped the order
 
         # Generate the comparison table
         comparison_table = generate_comparison_table(new, previous)
