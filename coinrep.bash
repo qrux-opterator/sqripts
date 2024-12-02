@@ -8,7 +8,7 @@ cd /root/ceremonyclient/node
 # Retrieve and process coin metadata
 COIN_DATA=$(
    ./qclient-2.0.4.1-linux-amd64 token coins metadata --public-rpc --config /root/ceremonyclient/node/.config | \
-awk -v hours="$HOURS" 
+awk -v hours="$HOURS" '
 BEGIN {
     ENVIRON["TZ"] = "UTC"
 }
