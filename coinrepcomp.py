@@ -132,8 +132,20 @@ def generate_comparison_table(new_report, previous_report):
     last_timeframe = timeframe_mapping.get(last_check, f"{last_check} Hours")
     previous_timeframe = timeframe_mapping.get(previous_check, f"{previous_check} Hours")
 
+    # Extract numerical hours for calculation
+    last_hours_match = re.match(r"(\d+)", last_timeframe)
+    previous_hours_match = re.match(r"(\d+)", previous_timeframe)
+
+    if last_hours_match and previous_hours_match:
+        last_hours = int(last_hours_match.group(1))
+        previous_hours = int(previous_hours_match.group(1))
+        timeframe_diff = abs(previous_hours - last_hours)
+        timeframe_diff_str = f"{timeframe_diff} Hours"
+    else:
+        timeframe_diff_str = "N/A"
+
     # Add the "Timeframe" row to the table
-    table_data.append(['Timeframe', last_timeframe, previous_timeframe, '22 Hours'])
+    table_data.append(['Timeframe', last_timeframe, previous_timeframe, timeframe_diff_str])
 
     # Define the keys to compare
     keys_to_compare = [key for key in new_report.keys() if key not in ['Date', 'raw', 'Check']]
@@ -146,14 +158,18 @@ def generate_comparison_table(new_report, previous_report):
         new_val_numeric = convert_value(new_val_str)
         prev_val_numeric = convert_value(prev_val_str)
 
+        # Initialize normalized values
+        new_normalized = None
+        prev_normalized = None
+
         # For 'Total QUIL earned' and 'Total per Worker', normalize values
         if key in ['Total QUIL earned', 'Total per Worker']:
-            # Normalize values to 22 hours
             try:
-                last_hours = int(re.sub(r'[^\d]', '', last_timeframe))
-                prev_hours = int(re.sub(r'[^\d]', '', previous_timeframe))
-                new_normalized = new_val_numeric * (22 / last_hours) if new_val_numeric is not None else None
-                prev_normalized = prev_val_numeric * (22 / prev_hours) if prev_val_numeric is not None else None
+                # Normalize new report to the previous time frame
+                if last_hours > 0:
+                    new_normalized = new_val_numeric * (previous_hours / last_hours) if new_val_numeric is not None else None
+                # Previous report is already in previous_hours, so no normalization needed
+                prev_normalized = prev_val_numeric  # Already in previous_hours
                 # Use normalized values for comparison
                 difference = compare_values(new_normalized, prev_normalized, key)
                 # Display normalized values in parentheses
