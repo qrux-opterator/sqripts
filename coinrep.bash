@@ -117,4 +117,3 @@ fi
 } >> /root/coinreport.log
 
 # Display the content of the log file
-cat /root/coinreport.log
