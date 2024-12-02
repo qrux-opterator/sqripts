@@ -8,7 +8,7 @@ init(autoreset=True)
 
 def is_separator_line(line):
     """
-    Determines if a line is a separator (composed entirely of '━' characters) or empty.
+    Determines if a line is a separator or empty.
     """
     stripped_line = line.strip()
     return all(c == '━' for c in stripped_line) or not stripped_line
@@ -16,7 +16,6 @@ def is_separator_line(line):
 def parse_report(report_lines):
     """
     Parses a single report and returns a dictionary of key-value pairs.
-    Prevents overwriting existing keys to ensure original values are retained.
     """
     data = {}
     if not report_lines:
@@ -96,7 +95,7 @@ def convert_value(value):
     if value is None:
         return None
     # Remove any non-numeric characters except for '.' and '-'
-    cleaned_value = re.sub(r'[^\d\.-]', '', value)
+    cleaned_value = re.sub(r'[^\d\.\-]', '', value)
     try:
         return float(cleaned_value)
     except ValueError:
@@ -104,14 +103,15 @@ def convert_value(value):
 
 def compare_values(new_value, previous_value, metric):
     """
-    Compares two numerical values and returns a formatted difference string.
+    Compares two numerical values and returns a formatted percentage difference string.
     """
-    if new_value is not None and previous_value is not None:
-        difference = new_value - previous_value
-        if difference > 0:
-            return f"{Fore.GREEN}🟩🔼 +{difference:.2f}{Style.RESET_ALL}"
-        elif difference < 0:
-            return f"{Fore.RED}🟥🔽 {difference:.2f}{Style.RESET_ALL}"
+    if new_value is not None and previous_value is not None and previous_value != 0:
+        percent_change = ((new_value - previous_value) / abs(previous_value)) * 100
+        percent_change = round(percent_change, 2)
+        if percent_change > 0:
+            return f"{Fore.GREEN}🟩🔼 +{percent_change:.2f}%{Style.RESET_ALL}"
+        elif percent_change < 0:
+            return f"{Fore.RED}🟥🔽 {percent_change:.2f}%{Style.RESET_ALL}"
         else:
             return f"{Fore.YELLOW}➖ No Change{Style.RESET_ALL}"
     return f"{Fore.YELLOW}➖ N/A{Style.RESET_ALL}"
@@ -119,7 +119,6 @@ def compare_values(new_value, previous_value, metric):
 def generate_comparison_table(new_report, previous_report):
     """
     Generates a table comparing new and previous report values.
-    Applies specific formatting to certain metrics.
     """
     table_data = []
     headers = ["Metric", "Last Check", "Previous Check", "Difference"]
@@ -130,10 +129,10 @@ def generate_comparison_table(new_report, previous_report):
 
     # Map 'Check' numbers to timeframes
     timeframe_mapping = {'2': '2 Hours', '24': '24 Hours'}
-    last_timeframe = timeframe_mapping.get(last_check, last_check)
-    previous_timeframe = timeframe_mapping.get(previous_check, previous_check)
+    last_timeframe = timeframe_mapping.get(last_check, f"{last_check} Hours")
+    previous_timeframe = timeframe_mapping.get(previous_check, f"{previous_check} Hours")
 
-    # Change 'Check' row to 'Timeframe' and update values
+    # Add the "Timeframe" row to the table
     table_data.append(['Timeframe', last_timeframe, previous_timeframe, '22 Hours'])
 
     # Define the keys to compare
