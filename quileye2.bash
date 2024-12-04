@@ -51,7 +51,7 @@ fetch_node_and_coin_info() {
 
 
     # Run node-info and format output
-    ./node-2.0.4.1-linux-amd64 --node-info | awk -v date="$date_info" -v coins="$coin_count" '
+    ./node-2.0.5-linux-amd64 --node-info | awk -v date="$date_info" -v coins="$coin_count" '
     /Peer ID/ {peer_id=$3}
     /Max Frame/ {max_frame=$3}
     /Active Workers/ {workers=$3}
